@@ -1,0 +1,45 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#instructions {
+    font-size: 16px;
+}
+
+#message {
+    font-size: 18px;
+    color: yellow;
+}
+
+/* SCREENS */
+#instructions, #death-screen, #win-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(5,5,5,0.98); color: white; text-align: center;
+    z-index: 1000; pointer-events: auto;
+}
+#death-screen, #win-screen { display: none; }
+#death-screen { background: black; color: #a00; }
+
+h1 { font-size: 60px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 5px; color: #ddd; }
+p { font-size: 18px; margin: 5px; color: #888; }
+
+.btn { background: #111; color: #ccc; border: 1px solid #444; padding: 15px 50px; cursor: pointer; font-size: 20px; margin-top: 30px; transition: 0.3s; pointer-events: auto; text-transform: uppercase; }
+.btn:hover { background: #333; color: #fff; border-color: #fff; }
+#respawn-btn { border-color: #00ff00; color: #00ff00; }
+#respawn-btn:hover { background: #004400; box-shadow: 0 0 20px #00ff00; }
+
+.slider-container { margin-top: 20px; opacity: 0.8; }
