@@ -14,7 +14,8 @@ const state = {
     monsterState: 'idle', sprint: false, stamina: 100,
     battery: 100, flashlightOn: true, volume: 0.5,
     panicMode: false, invertedMode: false,
-    adrenaline: 0, maxAdrenaline: 100
+    adrenaline: 0, maxAdrenaline: 100,
+    timeLeft: 600, maxTime: 600
 };
 
 let scene, camera, renderer, controls;
@@ -33,6 +34,7 @@ const staminaBar = document.getElementById('stamina-bar');
 const batteryBar = document.getElementById('battery-bar');
 const adrenalineWrapper = document.getElementById('adrenaline-wrapper');
 const adrenalineBar = document.getElementById('adrenaline-bar');
+const timeBar = document.getElementById('time-bar');
 const msgEl = document.getElementById('note-msg');
 const cpMsgEl = document.getElementById('checkpoint-msg');
 const flashEl = document.getElementById('flash');
@@ -52,6 +54,7 @@ document.getElementById('volume-slider').addEventListener('input', (e) => {
 
 document.getElementById('start-btn').addEventListener('click', () => {
     if (!scene) initGame();
+    state.timeLeft = 600;
     controls.lock();
     document.getElementById('instructions').style.display = 'none';
     document.getElementById('ui').style.display = 'block';
@@ -305,7 +308,11 @@ function handleRandomEvents(count) {
         return;
     }
     if (count === 10) {
-        winGame();
+        if (state.timeLeft > 0) {
+            winGame();
+        } else {
+            gameOver();
+        }
         return;
     }
 
@@ -362,13 +369,17 @@ function triggerBloodMode() {
 }
 
 function startChaseEvent() {
-    state.monsterState = 'chasing';
     teleportMonsterBehindPlayer(CONFIG.spawnDistance);
     state.adrenaline = 100;
     adrenalineWrapper.style.display = 'block';
     showMessage("БЕГИ! (15 сек)", 5000, "#00ffff");
     if (ambientSound) ambientSound.gain.gain.value = 0.2;
     startHeartbeat();
+
+    // Delay before monster starts chasing
+    setTimeout(() => {
+        if (!state.isGameOver) state.monsterState = 'chasing';
+    }, 3000); // 3 seconds delay
 
     if (chaseTimer) clearTimeout(chaseTimer);
     chaseTimer = setTimeout(() => {
@@ -395,6 +406,7 @@ function respawnPlayer() {
     state.stamina = 100;
     state.battery = 100;
     state.panicMode = false;
+    state.timeLeft = 600;
     scene.fog.color.setHex(0x020202);
 
     if (chaseTimer) clearTimeout(chaseTimer);
@@ -452,6 +464,14 @@ function animate() {
         const time = performance.now();
         const delta = (time - prevTime) / 1000;
         prevTime = time;
+
+        // Update time
+        state.timeLeft -= delta;
+        if (state.timeLeft <= 0) {
+            state.timeLeft = 0;
+            if (state.notes < 10) gameOver();
+        }
+        timeBar.style.width = (state.timeLeft / state.maxTime * 100) + '%';
 
         notes.forEach(note => {
             const scale = 1 + Math.sin(time * 0.003) * 0.1;
